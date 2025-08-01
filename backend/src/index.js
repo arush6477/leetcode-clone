@@ -1,0 +1,37 @@
+import express from "express"
+import cors from "cors"
+import cookieParser from "cookie-parser"
+import dotenv from "dotenv"
+dotenv.config()
+const app = express()
+
+app.use(express.json())
+app.use(express.urlencoded())
+app.use(cookieParser())
+app.use(cors({
+    origin:["localhost:5173", "localhost:3001"],
+    credentials:true
+}))
+
+
+// Router
+import authRouter from "./routes/auth.routes.js"
+
+// Routes
+app.use("/api/v1/auth",authRouter)
+
+
+// basic default route
+app.get("/", (req,res) =>{
+    res.send("Hello welcome, server is working fine!!!!!!")
+})
+
+
+const port = process.env.PORT || 8080
+
+app.listen(port,(req,res) => {
+    console.log(`Server is running on the port ${port}`)
+})
+
+
+//intitialising prismsa client
