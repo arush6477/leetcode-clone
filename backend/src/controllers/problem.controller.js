@@ -123,7 +123,36 @@ const getProblemById = asyncHandler(async (req, res) => {
 
 const updateProblem = asyncHandler(async (req, res) => { })
 
-const deleteProblem = asyncHandler(async (req, res) => { })
+const deleteProblem = asyncHandler(async (req, res) => { 
+    const { id } = req.params
+
+    try {
+        const problem = await db.problem.findUnique({
+            where: {
+                id
+            }
+        })
+
+        if (!problem) {
+            throw new ApiError(404, "Problem not found")
+        }
+
+        const deletedProblem = await db.problem.delete({
+            where: {
+                id
+            }
+        }) 
+    
+        if (!deletedProblem) {
+            throw new ApiError(404, "Problem not found")
+        }
+        return res.json(
+            new ApiResponse(200, deletedProblem, "Problem deleted successfully")
+        )
+    } catch (error) {
+        throw new ApiError(500, "Error deleting problem: " + error.message)
+    }
+})
 
 const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => { })
 
