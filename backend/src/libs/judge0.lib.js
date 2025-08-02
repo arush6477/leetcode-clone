@@ -1,9 +1,13 @@
+import axios from "axios"
+
+const sleep  = (ms)=> new Promise((resolve)=> setTimeout(resolve , ms))
+
 const getjudge0LanguageId = (language) => {
     const languageMap = {
-        "python": 71,
-        "javascript": 63,
-        "java": 62,
-        "c++": 54
+        "PYTHON": 71,
+        "JAVASCRIPT": 63,
+        "JAVA": 62,
+        "C++": 54
     }
 
     return languageMap[language.toUpperCase()]
@@ -13,8 +17,6 @@ const submitBatch = async (submissions) => {
     const { data } = await axios.post(`${process.env.JUDGE0_API_URL}submissions/batch?base64_encoded=false`,{
         submissions: submissions
     })
-
-    console.log("Submission Results:", data)
 
     return data // array of tokens
 }
@@ -27,17 +29,18 @@ const pollBatchResults = async (tokens) => {
                 base64_encoded: false,
             }
         })
+
         const results = data.submissions
 
         const isAllDone = results.every((result) => {
-            result.ststus.id !== 1 && result.status.id !== 2
+            return result.status.id !== 1 && result.status.id !== 2
         })
 
         if(isAllDone) {
             return results
         }
 
-        // call after every 1 sec 
+        // tp call after every 1 sec 
         await sleep(1000) 
     }
 }

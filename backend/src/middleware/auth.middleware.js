@@ -5,8 +5,7 @@ import { ApiError } from "../utils/apiError.js"
 const verifyToken = async (req, res, next) => {
     try {
         const token = req.cookies.jwt
-
-        console.log(token)
+        
         if (!token) {
             throw new ApiError(401, "unauthorized access || access denied") 
         }
@@ -43,14 +42,15 @@ const verifyToken = async (req, res, next) => {
     }
 }
 
-const checkAdmin = (req, res, next) => {
+const checkAdmin = async (req, res, next) => {
     try {
         const userId = req.user.id
-        const user = db.user.findUnique({
+        const user = await db.user.findUnique({
             where: {
                 id: userId
             }
         })
+
         if (!user || user.role !== 'ADMIN') {
             throw new ApiError(403, "Access denied")
         }
