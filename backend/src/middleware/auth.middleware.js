@@ -43,4 +43,24 @@ const verifyToken = async (req, res, next) => {
     }
 }
 
-export { verifyToken }
+const checkAdmin = (req, res, next) => {
+    try {
+        const userId = req.user.id
+        const user = db.user.findUnique({
+            where: {
+                id: userId
+            }
+        })
+        if (!user || user.role !== 'ADMIN') {
+            throw new ApiError(403, "Access denied")
+        }
+        next()
+    } catch (error) {
+        throw new ApiError(500, error.message)
+    }
+}
+
+export { 
+    verifyToken, 
+    checkAdmin
+}

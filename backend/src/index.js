@@ -16,10 +16,11 @@ app.use(cors({
 
 // Router
 import authRouter from "./routes/auth.routes.js"
+import problemRouter from "./routes/problem.routes.js"
 
 // Routes
 app.use("/api/v1/auth",authRouter)
-
+app.use("/api/v1/problems",problemRouter)
 
 // basic default route
 app.get("/", (req,res) =>{
