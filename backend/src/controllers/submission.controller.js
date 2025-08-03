@@ -6,5 +6,5 @@ import db from "../libs/db.js"
 const somefunction = asyncHandler(async (req, res) => { })
 
 export {
-
+    somefunction
 }
