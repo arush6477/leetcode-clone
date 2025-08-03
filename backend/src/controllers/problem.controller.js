@@ -117,7 +117,7 @@ const getProblemById = asyncHandler(async (req, res) => {
             new ApiResponse(200, problem, "Problem fetched successfully")
         )
     } catch (error) {
-        
+        throw new ApiError(500, "Error fetching problem: " + error.message)
     }
 })
 
@@ -154,7 +154,9 @@ const deleteProblem = asyncHandler(async (req, res) => {
     }
 })
 
-const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => { })
+const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => { 
+    const userId = req.user.id
+})
 
 export {
     createProblem,
