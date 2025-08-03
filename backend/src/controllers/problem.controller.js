@@ -82,12 +82,12 @@ const createProblem = asyncHandler(async (req, res) => {
     }
 })
 
-const getAllProblems = asyncHandler(async (req, res) => { 
+const getAllProblems = asyncHandler(async (req, res) => {
     try {
         // will add the conditions later
         const problems = await db.problem.findMany()
 
-        if(!problems){
+        if (!problems) {
             throw new ApiError(404, "No problems found")
         }
 
@@ -99,7 +99,7 @@ const getAllProblems = asyncHandler(async (req, res) => {
     }
 })
 
-const getProblemById = asyncHandler(async (req, res) => { 
+const getProblemById = asyncHandler(async (req, res) => {
     const { id } = req.params
 
     try {
@@ -109,7 +109,7 @@ const getProblemById = asyncHandler(async (req, res) => {
             }
         })
 
-        if(!problem) {
+        if (!problem) {
             throw new ApiError(404, "Problem not found")
         }
 
@@ -121,9 +121,92 @@ const getProblemById = asyncHandler(async (req, res) => {
     }
 })
 
-const updateProblem = asyncHandler(async (req, res) => { })
+const updateProblem = asyncHandler(async (req, res) => {
+    const {
+        title,
+        description,
+        difficulty,
+        tags,
+        examples,
+        constraints,
+        testcases,
+        codeSnippet,
+        refrenceSolutions
+    } = req.body
+    const { id } = req.params
 
-const deleteProblem = asyncHandler(async (req, res) => { 
+    if (!id) {
+        throw new ApiError(400, "Problem ID is required")
+    }
+
+    try {
+        const problemExists = await db.problem.findUnique({
+            where: {
+                id
+            }
+        })
+
+        if (!problemExists) {
+            throw new ApiError(404, "Problem not found")
+        }
+
+        for (const [language, solutionCode] of Object.entries(refrenceSolutions)) {
+            const languageId = getjudge0LanguageId(language)
+
+            if (!languageId) {
+                throw new ApiError(400, `Unsupported language: ${language}`)
+            }
+
+            const submissions = testcases.map(({ input, output }) => ({
+                source_code: solutionCode,
+                language_id: languageId,
+                stdin: input,
+                expected_output: output,
+            }))
+
+            // array of tokens of the batch submission
+            const submissionResults = await submitBatch(submissions)
+
+            const tokens = submissionResults.map((res) => { return res.token })
+
+            const results = await pollBatchResults(tokens)
+
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i]
+                if (result.status.id !== 3) {
+                    throw new ApiError(400, `Test case ${i + 1} failed for language ${language}: ${result.status.description}`)
+                }
+            }
+        }
+
+        const updatedProblem = await db.problem.update({
+            where: {
+                id
+            },
+            data: {
+                title,
+                description,
+                difficulty,
+                tags,
+                examples,
+                constraints,
+                testcases,
+                codeSnippet,
+                refrenceSolutions,
+                userId: req.user.id
+            }
+        })
+
+        return res.json(
+            new ApiResponse(200, updatedProblem, "Problem updated successfully")
+        )
+
+    } catch (error) {
+        throw new ApiError(500, "Error updating problem: " + error.message)
+    }
+})
+
+const deleteProblem = asyncHandler(async (req, res) => {
     const { id } = req.params
 
     try {
@@ -141,8 +224,8 @@ const deleteProblem = asyncHandler(async (req, res) => {
             where: {
                 id
             }
-        }) 
-    
+        })
+
         if (!deletedProblem) {
             throw new ApiError(404, "Problem not found")
         }
@@ -154,7 +237,7 @@ const deleteProblem = asyncHandler(async (req, res) => {
     }
 })
 
-const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => { 
+const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
     const userId = req.user.id
 })
 
