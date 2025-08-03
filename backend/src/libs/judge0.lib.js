@@ -45,8 +45,19 @@ const pollBatchResults = async (tokens) => {
     }
 }
 
+const getLanguageName = (languageId) => {
+    const languageMap = {
+        71: "PYTHON",
+        63: "JAVASCRIPT",
+        62: "JAVA",
+        54: "C++"
+    }
+    return languageMap[languageId]
+}
+
 export {
     getjudge0LanguageId,
     submitBatch,
-    pollBatchResults
+    pollBatchResults,
+    getLanguageName
 }
