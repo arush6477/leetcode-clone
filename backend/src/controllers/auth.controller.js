@@ -131,12 +131,12 @@ const loginUser = asyncHandler(async (req, res) => {
 const logOut = asyncHandler(async (req, res) => {
     try {
         res
-        .clearCookie("jwt", {
-            httpOnly:true,
-            sameSite: "Strict",
-            secure: process.env.NODE_ENV !== "development"
-        })
-        .json(new ApiResponse(204, null, "user logged out successfully"))
+            .clearCookie("jwt", {
+                httpOnly: true,
+                sameSite: "Strict",
+                secure: process.env.NODE_ENV !== "development"
+            })
+            .json(new ApiResponse(204, null, "user logged out successfully"))
     } catch (error) {
         throw new ApiError(500, error.message)
     }
@@ -148,6 +148,51 @@ const checkUser = asyncHandler(async (req, res) => {
     } catch (error) {
         throw new ApiError(500, error.message)
     }
+})
+
+const changePassword = asyncHandler(async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body
+
+        const userId = req.user.id
+
+        const findDatabase = await db.user.findUnique({
+            where: {
+                id: userId
+            }
+        })
+
+        const isMatch = await bcrypt.compare(oldPassword, findDatabase.password)
+
+        if (!isMatch) {
+            throw new ApiError(401, "old password is incorrect")
+        }
+
+        const hashPassword = await bcrypt.hash(newPassword, 10)
+
+        const changeDatabase = await db.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                password: hashPassword
+            }
+        })
+
+        if (!changeDatabase) {
+            throw new ApiError(500, "failed to update in the db")
+        }
+
+        return res.json(
+            new ApiResponse(200, {}, "password changed successfully")
+        )
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong: " + error.message)
+    }
+})
+
+const forgotPassword = asyncHandler(async (req,res) => {
+
 })
 
 export {
