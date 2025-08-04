@@ -38,6 +38,7 @@ model User {
   problem       Problem[]
   Submission    Submission[]
   ProblemSolved ProblemSolved[]
+  CustomList      CustomList[]
 }
 
 model Problem {
@@ -60,9 +61,10 @@ model Problem {
   updatedAt DateTime @updatedAt
 
   //relationship
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade) //samajh nahi aaya
-  submissions   Submission[]
-  solvedBy ProblemSolved[]
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade) //samajh nahi aaya
+  submissions       Submission[]
+  solvedBy          ProblemSolved[]
+  ProblemCustomList ProblemCustomList[]
 }
 
 model Submission {
@@ -121,4 +123,33 @@ model ProblemSolved {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, problemId])
+}
+
+model CustomList {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  problems ProblemCustomList[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([name, userId]) // unique CustomList names per user
+}
+
+model ProblemCustomList {
+  id         String   @id @default(uuid())
+  CustomListId String
+  problemId  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  CustomList CustomList @relation(fields: [CustomListId], references: [id], onDelete: Cascade)
+  problem  Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([CustomListId, problemId])
 }
