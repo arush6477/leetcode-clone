@@ -11,7 +11,7 @@ import {
 
 router.route("/get-all-submissions").get(verifyToken, getAllSubmissions)
 router.route("/get-submission/:problemId").get(verifyToken, getSubmissionsForProblems)
-router.route("/get-submissions-count/:problemId").delete(verifyToken,  getAllTheSubmissionsForProblem)
+router.route("/get-submissions-count/:problemId").get(verifyToken,  getAllTheSubmissionsForProblem)
 
 
 export default router

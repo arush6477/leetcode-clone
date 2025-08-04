@@ -27,12 +27,20 @@ const getSubmissionsForProblems = asyncHandler(async (req, res) => {
         const userId = req.user.id
         const { problemId } = req.params
 
+        if(!problemId) throw new ApiError(400, "problemId not found in the params");
+
         const submissions = await db.submission.findMany({
             where: {
                 userId: userId,
                 problemId: problemId
             }
         })
+
+
+        if(submissions.length === 0) {
+            throw new ApiError(404,"No submission for the given user or problem")
+        }
+
         return res.json(
             new ApiResponse(200, submissions, "Submissions for problem fetched successfully")
         )
