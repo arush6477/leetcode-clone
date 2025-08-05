@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
             }
         })
 
-        console.log("existingUser", existingUser)
+        console.log("existingUser from register controller", existingUser)
 
         if (existingUser) {
             throw new ApiError(401, "user already exists")
@@ -56,11 +56,13 @@ const registerUser = asyncHandler(async (req, res) => {
                 //will console log the newUser then will decide to send or not 
                 // currently going with his one 
                 {
-                    id: newUser.id,
-                    email: newUser.email,
-                    name: newUser.name,
-                    role: newUser.role,
-                    image: newUser.image
+                    user: {
+                        id: newUser.id,
+                        email: newUser.email,
+                        name: newUser.name,
+                        role: newUser.role,
+                        image: newUser.image
+                    }
                 },
                 "user created successfully"
             ))
@@ -278,12 +280,12 @@ const forgotPassword = asyncHandler(async (req, res) => {
             }
         })
 
-        if(!updateDatabase){
+        if (!updateDatabase) {
             throw new ApiError(500, "failed to update the password")
         }
         updateDatabase.password = hashPassword
         return res.json(
-            new ApiResponse(200,updateDatabase, "password updated successfully")
+            new ApiResponse(200, updateDatabase, "password updated successfully")
         )
     } catch (error) {
         throw new ApiError(500, "Something went wrong: " + error.message)

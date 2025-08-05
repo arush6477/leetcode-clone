@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(express.urlencoded())
 app.use(cookieParser())
 app.use(cors({
-    origin:["localhost:5173", "localhost:3001"],
+    origin:"http://localhost:5173",
     credentials:true
 }))
 
