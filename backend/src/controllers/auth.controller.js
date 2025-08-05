@@ -5,6 +5,7 @@ import { ApiError } from "../utils/apiError.js"
 import bcrypt from "bcryptjs"
 import { UserRole } from "../generated/prisma/index.js"
 import jwt from "jsonwebtoken"
+import { transporter } from "../utils/nodemailer.js"
 
 const registerUser = asyncHandler(async (req, res) => {
     const { email, password, name } = req.body
@@ -191,13 +192,110 @@ const changePassword = asyncHandler(async (req, res) => {
     }
 })
 
-const forgotPassword = asyncHandler(async (req,res) => {
 
+const requestToken = asyncHandler(async (req, res) => {
+    try {
+        const email = req.params.email
+
+        if (!email) {
+            throw new ApiError(401, "provide email in the params")
+        }
+
+        const user = await db.user.findUnique({
+            where: {
+                email
+            }
+        })
+
+        if (!user) {
+            throw new ApiError(404, "User not found")
+        }
+
+        const token = jwt.sign(user, process.env.JWT_SECRET, {
+            expiresIn: "1h"
+        })
+
+        if (!token) {
+            throw new ApiError(500, "failed making the token")
+        }
+
+
+        const mailOptions = {
+            to: user.email,
+            from: process.env.NODEMAILER_EMAIL,
+            subject: 'Password Reset Request',
+            text: `Hi ${user.name},\n\nWe received a request to reset your password.\n\nPlease use the token below to reset your password:\n${token}\n\nIf you did not request this, please ignore this email. Your password will remain unchanged.\n\nThanks,  \n[Your App Name] Team`,
+        }
+
+        const sendMailToken = await transporter.sendMail(mailOptions)
+
+        if (!sendMailToken) {
+            throw new ApiError(500, "Failed to send the email")
+        }
+
+        return res.json(
+            new ApiResponse(200, {}, "token sent successfully")
+        )
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while sending the token" + error.message)
+    }
+})
+
+
+const forgotPassword = asyncHandler(async (req, res) => {
+    try {
+        const { email, newPassword } = req.body
+        const token = req.params.token
+
+        if (!email || !newPassword || !token) {
+            throw new ApiError(401, "email or password msiisng in the body")
+        }
+
+        const user = await db.user.findUnique({
+            where: {
+                email
+            }
+        })
+
+        if (!user) {
+            throw new ApiError(404, "user does not exist")
+        }
+
+        const verifyToken = jwt.verify(token, process.env.JWT_SECRET)
+
+        if (!verifyToken) {
+            throw new ApiError(401, "invalid token!!!!!")
+        }
+
+        const hashPassword = await bcrypt.hash(newPassword, 10)
+
+        const updateDatabase = await db.user.update({
+            where: {
+                email
+            },
+            data: {
+                password: hashPassword
+            }
+        })
+
+        if(!updateDatabase){
+            throw new ApiError(500, "failed to update the password")
+        }
+        updateDatabase.password = hashPassword
+        return res.json(
+            new ApiResponse(200,updateDatabase, "password updated successfully")
+        )
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong: " + error.message)
+    }
 })
 
 export {
     registerUser,
     loginUser,
     logOut,
-    checkUser
+    checkUser,
+    changePassword,
+    forgotPassword,
+    requestToken
 }

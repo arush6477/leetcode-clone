@@ -8,7 +8,9 @@ import {
     registerUser,
     loginUser,
     logOut,
-    checkUser    
+    checkUser,
+    requestToken,  
+    forgotPassword
 } from "../controllers/auth.controller.js"
 
 // routes
@@ -16,5 +18,7 @@ router.route("/register").post(registerUser)
 router.route("/login").post(loginUser)
 router.route("/logout").post(verifyToken, logOut)
 router.route("/check").get(verifyToken, checkUser)
+router.route("/request-token/:email").get(requestToken)
+router.route("/forgot-password/:token").post(forgotPassword)
 
 export default router 
