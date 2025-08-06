@@ -76,6 +76,9 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
+    console.log("Email: ", email)
+    console.log("password: ", password)
+
     try {
         const user = await db.user.findUnique({
             where: {
@@ -115,11 +118,13 @@ const loginUser = asyncHandler(async (req, res) => {
                 //will console log the newUser then will decide to send or not 
                 // currently going with his one 
                 {
-                    id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    role: user.role,
-                    image: user.image
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: user.role,
+                        image: user.image
+                    }
                 },
                 "user logged in successfully"
             ))
