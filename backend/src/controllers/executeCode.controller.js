@@ -98,46 +98,46 @@ const executeCode = asyncHandler(async (req, res) => {
             await db.problemSolved.upsert({
                 where: {
                     userId_problemId: {
-                        userId, problemId:problem_id
+                        userId, problemId: problem_id
                     }
                 },
                 update: {
 
                 },
-                create:{
-                    userId,problemId: problem_id
+                create: {
+                    userId, problemId: problem_id
                 }
             })
         }
 
         const testCaseResults = detailedResults.map((result) => ({
-      submissionId: submission.id,
-      testCase: result.testCase,
-      passed: result.passed,
-      stdout: result.stdout,
-      expected: result.expected,
-      stderr: result.stderr,
-      compileOutput: result.compile_output,
-      status: result.status,
-      memory: result.memory,
-      time: result.time,
-    }));
+            submissionId: submission.id,
+            testCase: result.testCase,
+            passed: result.passed,
+            stdout: result.stdout,
+            expected: result.expected,
+            stderr: result.stderr,
+            compileOutput: result.compile_output,
+            status: result.status,
+            memory: result.memory,
+            time: result.time,
+        }));
 
-    await db.testCaseResult.createMany({
-      data: testCaseResults,
-    });
+        await db.testCaseResult.createMany({
+            data: testCaseResults,
+        });
 
-    const submissionWithTestCase = await db.submission.findUnique({
-      where: {
-        id: submission.id,
-      },
-      include: {
-        testCases: true,
-      },
-    });
+        const submissionWithTestCase = await db.submission.findUnique({
+            where: {
+                id: submission.id,
+            },
+            include: {
+                testCases: true,
+            },
+        });
 
         return res.json(
-            new ApiResponse(200, submissionWithTestCase, "Code executed successfully")
+            new ApiResponse(200, { submission: submissionWithTestCase }, "Code executed successfully")
         )
     } catch (error) {
         throw new ApiError(500, "Internal Server Error" + error.message)

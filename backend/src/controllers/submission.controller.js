@@ -59,7 +59,7 @@ const getAllTheSubmissionsForProblem = asyncHandler(async (req, res) => {
         })
 
         return res.json(
-            new ApiResponse(200, submissions, "All submissions for problem fetched successfully")
+            new ApiResponse(200, {count: submissions }, "All submissions for problem fetched successfully")
         )
     } catch (error) {
         throw new ApiError(500, "Error fetching all submissions for problem: " + error.message)

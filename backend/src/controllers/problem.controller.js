@@ -38,7 +38,7 @@ const createProblem = asyncHandler(async (req, res) => {
     console.log("refrenceSolutions: ", refrenceSolutions)
 
 
-    // try {
+    try {
     for (const [language, solutionCode] of Object.entries(refrenceSolutions)) {
         const languageId = getjudge0LanguageId(language)
 
@@ -87,17 +87,27 @@ const createProblem = asyncHandler(async (req, res) => {
 
     return res
         .json(
-            new ApiResponse(201, newProblem, "Problem created successfully")
+            new ApiResponse(201, {problem: newProblem }, "Problem created successfully")
         )
-    // } catch (error) {
-    //     throw new ApiError(500, "Error creating problem: " + error)
-    // }
+    } catch (error) {
+        throw new ApiError(500, "Error creating problem: " + error)
+    }
 })
 
 const getAllProblems = asyncHandler(async (req, res) => {
     try {
         // will add the conditions later
-        const problems = await db.problem.findMany()
+        const problems = await db.problem.findMany(
+             {
+        include:{
+          solvedBy:{
+            where:{
+              userId:req.user.id
+            }
+          }
+        }
+      }
+        )
 
         if (!problems) {
             throw new ApiError(404, "No problems found")
@@ -124,6 +134,8 @@ const getProblemById = asyncHandler(async (req, res) => {
         if (!problem) {
             throw new ApiError(404, "Problem not found")
         }
+
+        problem.codeSnippets = problem.codeSnippet
 
         return res.json(
             new ApiResponse(200, problem, "Problem fetched successfully")

@@ -154,7 +154,7 @@ const deleteList = asyncHandler(async (req, res) => {
         }
 
         return res.json(
-            new ApiResponse(201, {}, "deleted from the database successfully")
+            new ApiResponse(201, deleteDatabase, "deleted from the database successfully")
         );
     } catch (error) {
         throw new ApiError(500, "something went wrong: " + error.message);

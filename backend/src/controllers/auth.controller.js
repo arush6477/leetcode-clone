@@ -152,7 +152,7 @@ const logOut = asyncHandler(async (req, res) => {
 
 const checkUser = asyncHandler(async (req, res) => {
     try {
-        res.json(new ApiResponse(200, req.user, "user is authenticated"))
+        res.json(new ApiResponse(200, { user: req.user }, "user is authenticated"))
     } catch (error) {
         throw new ApiError(500, error.message)
     }
