@@ -23,7 +23,7 @@ import submissionRouter from "./routes/submission.routes.js"
 // Routes
 app.use("/api/v1/auth",authRouter)
 app.use("/api/v1/problems",problemRouter)
-app.use("/api/v1/execute-code",codeExecutionRouter)
+app.use("/api/v1/",codeExecutionRouter)
 app.use("/api/v1/submission",submissionRouter)
 
 // basic default route
