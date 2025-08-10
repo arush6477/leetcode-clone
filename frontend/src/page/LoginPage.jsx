@@ -38,6 +38,7 @@ const LoginPage = () => {
   const onSubmit = async (data)=>{
     try {
       await login(data)
+      
     } catch (error) {
       console.error("Signup failed" , error)
     }
@@ -126,16 +127,14 @@ const LoginPage = () => {
             <button
               type="submit"
               className="btn btn-primary w-full"
-              // disabled={isLoggingIn}
+              disabled={isLoggingIn}
             >
-               {
-               isLoggingIn ? (
+               {isLoggingIn ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
                   Loading...
                 </>
-              ) :
-               (
+              ) : (
                 "Sign in"
               )}
             </button>

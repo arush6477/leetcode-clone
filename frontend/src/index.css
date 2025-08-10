@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* @keyframes blink {
+@keyframes blink {
     0%,
     100% {
       opacity: 1;
@@ -50,4 +50,4 @@
       transform: scale(1.05);
     }
   }
-   */
+  

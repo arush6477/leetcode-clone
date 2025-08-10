@@ -5,16 +5,17 @@ import { db } from "../libs/db.js";
 
 const createList = asyncHandler(async (req, res) => {
     try {
-        const { title, description } = req.body;
+        const { name , description } = req.body;
+        console.log(req.body)
         const userId = req.user.id;
 
-        if (!title || !description) {
-            throw new ApiError(401, "title or description are missing");
+        if (!name  || !description) {
+            throw new ApiError(401, "name  or description are missing");
         }
 
         const createList = await db.customList.create({
             data: {
-                title,
+                name ,
                 description,
                 userId,
             },

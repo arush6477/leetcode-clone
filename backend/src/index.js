@@ -19,12 +19,14 @@ import authRouter from "./routes/auth.routes.js"
 import problemRouter from "./routes/problem.routes.js"
 import codeExecutionRouter from "./routes/executeCode.routes.js"
 import submissionRouter from "./routes/submission.routes.js"
+import listRouter from "./routes/customlist.routes.js"
 
 // Routes
 app.use("/api/v1/auth",authRouter)
 app.use("/api/v1/problems",problemRouter)
 app.use("/api/v1/",codeExecutionRouter)
 app.use("/api/v1/submission",submissionRouter)
+app.use("/api/v1/list", listRouter)
 
 // basic default route
 app.get("/", (req,res) =>{
